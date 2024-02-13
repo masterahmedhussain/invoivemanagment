@@ -1,8 +1,9 @@
 spring:
   datasource:
-    url: jdbc:mysql://localhost:3306/invoicemanagment
+    url: jdbc:mysql://localhost:3306/invoicemanagement
     password: admin
     username: root
+    driver-class-name: com.mysql.jdbc.Driver
   jpa:
     database-platform: org.hibernate.dialect.MySQL8InnoDialect
     generate-ddl: true
@@ -16,4 +17,7 @@ spring:
         format_sql: true
   sql:
     init:
-      mode: never
+      mode: always
+      continue-on-error: false
+server: 
+  port: 8082
