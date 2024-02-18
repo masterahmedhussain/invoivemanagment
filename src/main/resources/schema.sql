@@ -14,14 +14,98 @@ CREATE TABLE Users (
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
     phone VARCHAR(12) DEFAULT NULL,
-    email VARCHAR(20) NOT NULL
-
+    email VARCHAR(20) NOT NULL,
+    enabled BOOLEAN DEFAULT FALSE,
+    non_locked BOOLEAN DEFAULT FALSE,
+    using_mfa BOOLEAN DEFAULT FALSE,
+    CONSTAINT UQ_Users_Email UNIQUE (email)
 )
 
 
 DROP TABLE IF EXIST Roles;
+ 
+ CREATE TABLE Roles (
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    role_name  NOT NULL,
+    name VARCHAR(255) NOT NULL,
+    permission VARCHAR(255) NOT NULL,
+    CONSTAINT UQ_Roles_Name UNIQUE (name)
+)
 
 
 
+DROP TABLE IF EXIST UserRoles;
+ 
+ CREATE TABLE UserRoles (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    role_id BIGINT UNSIGNED NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (role_id) REFERENCES Roles (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+
+    CONSTAINT UQ_UserRoles_User_id UNIQUE (user_id)
+)
+
+DROP TABLE IF EXIST Events;
+ 
+ CREATE TABLE Events (
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    type VARCHAR(255) NOT NULL CHECK(type in ('LOGIN_ATTEMPT', 'LOGIN_ATTEMPT_FAILURE'),
+    description VARCHAR(255) NOT NULL,
+    CONSTAINT UQ_Events_Type UNIQUE (type)
+)
+
+
+DROP TABLE IF EXIST UserEvents;
+ 
+ CREATE TABLE UserEvents (
+    id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT UNSIGNED NOT NULL,
+    event_id BIGINT UNSIGNED NOT NULL,
+    device VARCHAR(255) NOT NULL,
+    ip_address VARCHAR(255) NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    FOREIGN KEY (event_id) REFERENCES Events (id) ON DELETE RESTRICT ON UPDATE CASCADE,
+
+)
+
+
+DROP TABLE IF EXISTS AccountVerfications;
+
+CREATE TABLE AccountVerfications 
+(
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    url VARCHAR(255) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTAINT UQ_AccountVerfications_User_Id UNIQUE (user_id),
+    CONSTAINT UQ_AccountVerfications_Url UNIQUE (url)
+)
+
+
+DROP TABLE IF EXISTS ResetPasswordVerfications;
+
+CREATE TABLE ResetPasswordVerfications 
+(
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    url VARCHAR(255) NOT NULL,
+    expiration_date DATETIME NOT NULL
+    FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTAINT UQ_ResetPasswordVerfications_User_Id UNIQUE (user_id),
+    CONSTAINT UQ_ResetPasswordVerfications_Url UNIQUE (url)
+)
+
+
+DROP TABLE IF EXISTS TwoFactorVerfications;
+
+CREATE TABLE TwoFactorVerfications 
+(
+    id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+    user_id BIGINT NOT NULL,
+    code VARCHAR(255) NOT NULL,
+    expiration_date DATETIME NOT NULL
+    FOREIGN KEY (user_id) REFERENCES Users (id) ON DELETE CASCADE ON UPDATE CASCADE,
+    CONSTAINT UQ_TwoFactorVerfications_User_Id UNIQUE (user_id),
+    CONSTAINT UQ_TwoFactorVerfications_Code UNIQUE (code)
+)
