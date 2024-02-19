@@ -14,8 +14,10 @@ CREATE TABLE Users (
     id BIGINT NOT NULL AUTO_INCREMENT PRIMARY KEY,
     first_name VARCHAR(255) NOT NULL,
     last_name VARCHAR(255) NOT NULL,
+    password varchar(20) NOT NULL,
     phone VARCHAR(12) DEFAULT NULL,
     email VARCHAR(20) NOT NULL,
+    title varchar(20) DEFAULT NULL
     enabled BOOLEAN DEFAULT FALSE,
     non_locked BOOLEAN DEFAULT FALSE,
     using_mfa BOOLEAN DEFAULT FALSE,
